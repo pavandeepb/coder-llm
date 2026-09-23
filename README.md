@@ -588,3 +588,17 @@ pip install -r requirements.txt
 ---
 
 *Built from scratch — no pre-trained weights, no black boxes. Every weight in the model was initialised randomly and learned entirely from your training data.*
+
+
+
+
+
+
+
+
+
+https://github.com/user-attachments/assets/0b452fb9-f9ee-42a4-860c-706e6153a6af
+
+
+
+
