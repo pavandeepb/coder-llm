@@ -47,38 +47,8 @@ Every setting in this project — batch size, sequence length, model size, mixed
 ## How It Works — The Big Picture
 
 ```
-Your code files (.py, .js, .ts, .java, .cpp ...)
-        │
-        ▼
-  [1] Download Data          scripts/download_data.py
-        │  Pull code from GitHub (CodeParrot, CodeSearchNet)
-        │
-        ▼
-  [2] Train Tokenizer        scripts/train_tokenizer.py
-        │  Learn a vocabulary of 32,000 subword tokens from your code
-        │  Add special tokens: <fim_prefix> <fim_suffix> <fim_middle>
-        │
-        ▼
-  [3] Preprocess Data        scripts/preprocess_data.py
-        │  Convert all code files → flat sequence of token IDs
-        │  Save as memory-mapped binary (train.bin, val.bin)
-        │  Never loads full dataset into RAM
-        │
-        ▼
-  [4] Train                  scripts/train.py
-        │  42M parameter GPT transformer learns to predict next token
-        │  50% of batches use FIM transform (fill-in-the-middle)
-        │  Checkpoints saved every 2000 steps
-        │
-        ▼
-  [5] Generate               scripts/generate.py
-        │  Load a checkpoint, give it a prompt, get code back
-        │
-        ▼
-  [6] Evaluate               scripts/eval_code.py
-        │  HumanEval pass@k benchmark
-        │  Syntax check pass rate
-        │  Perplexity on validation set
+<img width="780" height="1156" alt="Code Model Training Pipeline" src="https://github.com/user-attachments/assets/e7d0db29-cab7-435c-8697-ce1d6f7d241b" />
+
 ```
 
 ---
