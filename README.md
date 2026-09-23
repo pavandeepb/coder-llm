@@ -47,7 +47,9 @@ Every setting in this project — batch size, sequence length, model size, mixed
 ## How It Works — The Big Picture
 
 ```
-<img width="780" height="1156" alt="Code Model Training Pipeline" src="https://github.com/user-attachments/assets/e7d0db29-cab7-435c-8697-ce1d6f7d241b" />
+
+ <img width="780" height="1156" alt="Code Model Training Pipeline" src="https://github.com/user-attachments/assets/e7d0db29-cab7-435c-8697-ce1d6f7d241b" />
+
 
 ```
 
