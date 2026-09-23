@@ -1,0 +1,113 @@
+# =============================================================================
+# .gitignore for Coder LLM Training Project
+# =============================================================================
+
+# -------------------------------------
+# Training data — too large for GitHub
+# -------------------------------------
+data/raw/
+data/processed/
+data/*.bin
+data/*.jsonl
+
+# Keep the directory structure but not the files
+!data/.gitkeep
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# -------------------------------------
+# Model weights and checkpoints
+# -------------------------------------
+models/checkpoints/
+models/tokenizer/
+*.pt
+*.bin
+*.safetensors
+
+# Keep the empty directory markers
+!models/.gitkeep
+!models/checkpoints/.gitkeep
+!models/tokenizer/.gitkeep
+
+# -------------------------------------
+# Python
+# -------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+sdist/
+develop-eggs/
+.installed.cfg
+lib/
+lib64/
+.eggs/
+
+# Virtual environments
+env/
+venv/
+.venv/
+ENV/
+llm-train/
+llm_train/
+
+# -------------------------------------
+# Logs and outputs
+# -------------------------------------
+logs/
+*.log
+wandb/
+runs/
+
+# Keep log directory marker
+!logs/.gitkeep
+
+# -------------------------------------
+# Jupyter
+# -------------------------------------
+.ipynb_checkpoints/
+*.ipynb
+
+# -------------------------------------
+# OS
+# -------------------------------------
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# -------------------------------------
+# IDE
+# -------------------------------------
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# -------------------------------------
+# Misc
+# -------------------------------------
+*.tmp
+*.temp
+*.swp
+*.swo
+.env
+.env.local

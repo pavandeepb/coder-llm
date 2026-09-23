@@ -1,0 +1,16 @@
+# Core deep learning framework — installed separately with the CUDA index URL,
+# see setup_env.sh. Listed here for reference only.
+# torch
+# torchvision
+# torchaudio
+
+transformers>=4.44.0
+datasets>=2.20.0
+tokenizers>=0.19.1
+accelerate>=0.33.0
+numpy>=1.26.0
+matplotlib>=3.9.0
+tqdm>=4.66.0
+sentencepiece>=0.2.0
+huggingface_hub>=0.24.0
+wandb>=0.17.0

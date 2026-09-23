@@ -1,0 +1,159 @@
+# =============================================================================
+# train_config.yaml — Coder LLM configuration
+# Tuned for code generation: larger context, bigger vocab, FIM training.
+# =============================================================================
+
+# ---------------------------------------------------------------------------
+# Model architecture — tuned for RTX 3050 6 GB VRAM
+# ---------------------------------------------------------------------------
+model:
+  vocab_size: 32000          # smaller vocab = smaller embedding table = less VRAM
+  hidden_size: 512           # compact but expressive
+  num_layers: 8              # 8 layers is enough to learn real code patterns
+  num_heads: 8               # head_dim = 512/8 = 64 (optimal for Flash Attention)
+  max_seq_len: 1024          # 1024 tokens ~ 40-60 lines of code; fits in 6GB
+  dropout: 0.0               # no dropout for small models — regularise via data
+  mlp_ratio: 4.0             # SwiGLU inner dim = 2048
+  bias: false
+
+# Architecture note — approximate parameter counts:
+#   hidden=512  / layers=8  / heads=8   →  ~42 M params  ← YOU ARE HERE (6 GB GPU)
+#   hidden=768  / layers=12 / heads=12  →  ~85 M params  (needs ~10 GB)
+#   hidden=1024 / layers=24 / heads=16  →  ~350 M params (needs ~24 GB)
+
+# ---------------------------------------------------------------------------
+# Training hyper-parameters — tuned for 6 GB VRAM
+# ---------------------------------------------------------------------------
+training:
+  batch_size: 2                      # 2 sequences × 1024 tokens = 2048 tokens/step
+  gradient_accumulation_steps: 16    # effective batch = 32 sequences = 32k tokens
+  learning_rate: 3.0e-4
+  weight_decay: 0.1
+  warmup_steps: 500                  # shorter warmup for smaller model
+  max_steps: 50000                   # ~50k steps is solid for 42M on 1-2 GB data
+  mixed_precision: fp16              # RTX 3050 is Ampere but laptop — fp16 is safer
+  gradient_checkpointing: true       # CRITICAL: saves ~40% VRAM at ~20% speed cost
+  seed: 1337
+  grad_clip: 1.0
+
+# Throughput estimate on RTX 3050 6GB:
+#   ~1,500–2,500 tokens/sec → 50k steps × 32k tokens ≈ 17-28 hours
+#   Use --max_steps 10000 for a quick 3-6 hour test run first
+
+# ---------------------------------------------------------------------------
+# Fill-in-the-Middle (FIM) training
+# Teaches the model to complete code in the MIDDLE of a file, not just at end.
+# This is what makes Copilot-style completions work.
+# ---------------------------------------------------------------------------
+fim:
+  enabled: true
+  fim_rate: 0.5              # 50% of samples are transformed to FIM format
+  # Special tokens injected into the tokenizer:
+  #   <fim_prefix>  — everything before the cursor
+  #   <fim_suffix>  — everything after the cursor
+  #   <fim_middle>  — the model must predict this
+  spm_rate: 0.5              # within FIM: 50% SPM order, 50% PSM order
+  # PSM: <prefix> <suffix> <middle>  (standard)
+  # SPM: <suffix> <prefix> <middle>  (helps with suffix conditioning)
+
+# ---------------------------------------------------------------------------
+# Data
+# ---------------------------------------------------------------------------
+data:
+  raw_dir: data/raw                       # raw code files (.py, .js, .ts, etc.)
+  processed_dir: data/processed          # tokenised .bin shards
+  tokenizer_path: models/tokenizer       # trained tokenizer
+
+  # File extensions to include during preprocessing
+  code_extensions:
+    - .py
+    - .js
+    - .ts
+    - .jsx
+    - .tsx
+    - .cpp
+    - .c
+    - .h
+    - .hpp
+    - .java
+    - .go
+    - .rs
+    - .rb
+    - .cs
+    - .php
+    - .swift
+    - .kt
+    - .sh
+    - .md          # markdown docs / READMEs
+    - .txt
+
+  # Files/dirs to skip during preprocessing
+  exclude_patterns:
+    - node_modules
+    - .git
+    - __pycache__
+    - dist
+    - build
+    - vendor
+    - "*.min.js"
+    - "*.lock"
+
+  # Per-file size limits
+  min_file_bytes: 64         # skip near-empty files
+  max_file_bytes: 1048576    # skip files > 1 MB (auto-generated, minified, etc.)
+
+# ---------------------------------------------------------------------------
+# Tokenizer training
+# ---------------------------------------------------------------------------
+tokenizer:
+  vocab_size: 32000          # matches model.vocab_size above
+  min_freq: 2
+  batch_size: 1000
+  extra_special_tokens:
+    - <fim_prefix>
+    - <fim_suffix>
+    - <fim_middle>
+    - <|endoftext|>
+    - <|python|>
+    - <|javascript|>
+    - <|typescript|>
+    - <|cpp|>
+    - <|java|>
+    - <|go|>
+    - <|rust|>
+
+# ---------------------------------------------------------------------------
+# Checkpointing
+# ---------------------------------------------------------------------------
+checkpointing:
+  output_dir: models/checkpoints
+  save_every_steps: 2000
+  keep_last_n: 3
+
+# ---------------------------------------------------------------------------
+# Logging
+# ---------------------------------------------------------------------------
+logging:
+  log_dir: logs
+  log_every_steps: 50
+  use_wandb: false
+
+# ---------------------------------------------------------------------------
+# Generation defaults
+# ---------------------------------------------------------------------------
+generation:
+  max_new_tokens: 512        # code completions can be long
+  temperature: 0.2           # low temp = more deterministic code
+  top_k: 50
+  top_p: 0.95
+  repetition_penalty: 1.0   # repetition is normal in code (loops, etc.)
+
+# ---------------------------------------------------------------------------
+# Code evaluation  (used by scripts/eval_code.py)
+# ---------------------------------------------------------------------------
+evaluation:
+  humaneval_path: data/HumanEval.jsonl   # download with scripts/download_data.py
+  n_samples: 20              # samples per problem for pass@k
+  temperature: 0.2
+  top_p: 0.95
+  timeout_seconds: 10        # per-problem execution timeout
