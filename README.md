@@ -1,8 +1,5 @@
 # Coder LLM — Build Your Own Code Generation AI From Scratch
-
-https://github.com/user-attachments/assets/0b452fb9-f9ee-42a4-860c-706e6153a6af
-
-
+https://github.com/user-attachments/assets/11693a0b-4f62-465d-8768-ff5eb7928942
 A complete, end-to-end pipeline to train a **GPT-style language model that generates code**, built entirely from scratch using PyTorch. No pre-trained weights, no fine-tuning — raw code in, a working AI code model out.
 
 Inspired by how GitHub Copilot works, this project teaches the model to complete code at the cursor position using a technique called **Fill-In-the-Middle (FIM)** training.
